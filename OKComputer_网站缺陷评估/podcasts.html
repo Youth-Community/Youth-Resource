@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Podcasts - Youth Resources</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&family=Caveat:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --forest-green: #2D5A3D;
+            --warm-coral: #FF7F7F;
+            --soft-lavender: #B8A9C9;
+            --warm-cream: #F8F6F0;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--warm-cream) 0%, #F0F4F0 100%);
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, var(--forest-green), var(--warm-coral));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .nav-blur {
+            backdrop-filter: blur(10px);
+            background: rgba(248, 246, 240, 0.9);
+        }
+        
+        .podcast-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .podcast-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(45, 90, 61, 0.15);
+        }
+        
+        .audio-player {
+            background: rgba(45, 90, 61, 0.05);
+            border-radius: 12px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .progress-bar {
+            background: rgba(45, 90, 61, 0.2);
+            height: 6px;
+            border-radius: 3px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        
+        .progress-fill {
+            background: var(--forest-green);
+            height: 100%;
+            width: 0%;
+            transition: width 0.1s ease;
+        }
+        
+        .control-btn {
+            background: var(--forest-green);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .control-btn:hover {
+            background: #3A6B4A;
+            transform: scale(1.05);
+        }
+        
+        .category-tab {
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            background: rgba(45, 90, 61, 0.1);
+            color: var(--forest-green);
+            border: 1px solid rgba(45, 90, 61, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .category-tab.active {
+            background: var(--forest-green);
+            color: white;
+        }
+        
+        .featured-podcast {
+            background: linear-gradient(135deg, var(--forest-green), #3A6B4A);
+            border-radius: 20px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .featured-podcast::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('resources/podcast-studio.jpg') center/cover;
+            opacity: 0.2;
+            z-index: 0;
+        }
+        
+        .featured-content {
+            position: relative;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 nav-blur border-b border-white/20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="index.html" class="text-2xl font-bold gradient-text" style="font-family: 'Playfair Display', serif;">Youth Resources</a>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="index.html" class="text-gray-700 hover:text-green-600 font-medium transition-colors">Home</a>
+                    <a href="search.html" class="text-gray-700 hover:text-green-600 font-medium transition-colors">Search</a>
+                    <a href="podcasts.html" class="text-green-600 font-medium">Podcasts</a>
+                    <a href="login.html" class="text-gray-700 hover:text-green-600 font-medium transition-colors">Login</a>
+                    <a href="signup.html" class="bg-green-600 text-white px-4 py-2 rounded-full font-medium hover:bg-green-700 transition-colors">Sign Up</a>
+                </div>
+                <div class="md:hidden">
+                    <button id="mobile-menu-btn" class="text-gray-700">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden bg-white/95 backdrop-blur-lg border-t border-gray-200">
+            <div class="px-4 py-2 space-y-2">
+                <a href="index.html" class="block py-2 text-gray-700 hover:text-green-600">Home</a>
+                <a href="search.html" class="block py-2 text-gray-700 hover:text-green-600">Search</a>
+                <a href="podcasts.html" class="block py-2 text-green-600 font-medium">Podcasts</a>
+                <a href="login.html" class="block py-2 text-gray-700 hover:text-green-600">Login</a>
+                <a href="signup.html" class="block py-2 text-gray-700 hover:text-green-600">Sign Up</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-24 pb-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h1 class="text-4xl md:text-5xl font-bold gradient-text mb-6" style="font-family: 'Playfair Display', serif;">
+                    Youth Voices Podcast
+                </h1>
+                <p class="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+                    Listen to inspiring conversations, expert insights, and youth perspectives on education, career, and personal growth
+                </p>
+            </div>
+
+            <!-- Featured Episode -->
+            <div class="featured-podcast p-8 mb-12">
+                <div class="featured-content">
+                    <div class="flex items-center mb-4">
+                        <span class="bg-white/20 text-white px-3 py-1 rounded-full text-sm font-medium">Featured Episode</span>
+                    </div>
+                    <h2 class="text-3xl font-bold mb-4">The Future of Digital Learning</h2>
+                    <p class="text-white/90 mb-6 max-w-2xl">
+                        Join us as we explore how technology is transforming education and what it means for young learners in the digital age.
+                    </p>
+                    <div class="flex items-center space-x-6 mb-6">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span>45 minutes</span>
+                        </div>
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span>Published Jan 15, 2024</span>
+                        </div>
+                    </div>
+                    <button class="bg-white text-green-600 px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors" onclick="playFeaturedEpisode()">
+                        ▶ Listen Now
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Category Tabs -->
+    <section class="pb-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-wrap gap-3 justify-center">
+                <button class="category-tab active" data-category="all">All Episodes</button>
+                <button class="category-tab" data-category="education">Education</button>
+                <button class="category-tab" data-category="career">Career</button>
+                <button class="category-tab" data-category="technology">Technology</button>
+                <button class="category-tab" data-category="health">Health & Wellness</button>
+                <button class="category-tab" data-category="business">Business</button>
+                <button class="category-tab" data-category="personal">Personal Growth</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Episodes Grid -->
+    <section class="pb-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div id="episodes-container" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Episodes will be populated by JavaScript -->
+            </div>
+            
+            <!-- Load More Button -->
+            <div class="text-center mt-12">
+                <button id="load-more-episodes" class="bg-green-600 text-white px-8 py-3 rounded-full font-medium hover:bg-green-700 transition-colors">
+                    Load More Episodes
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Audio Player (Fixed Bottom) -->
+    <div id="audio-player" class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 transform translate-y-full transition-transform duration-300 z-50">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <img id="player-image" src="" alt="" class="w-12 h-12 rounded-lg object-cover">
+                <div>
+                    <h4 id="player-title" class="font-semibold text-gray-900"></h4>
+                    <p id="player-author" class="text-sm text-gray-600"></p>
+                </div>
+            </div>
+            
+            <div class="flex-1 max-w-2xl mx-8">
+                <div class="flex items-center justify-center space-x-4 mb-2">
+                    <button class="control-btn" id="prev-btn">⏮</button>
+                    <button class="control-btn" id="play-pause-btn">▶</button>
+                    <button class="control-btn" id="next-btn">⏭</button>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <span id="current-time" class="text-sm text-gray-500">0:00</span>
+                    <div class="progress-bar flex-1" id="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <span id="total-time" class="text-sm text-gray-500">0:00</span>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <button id="volume-btn" class="text-gray-600 hover:text-gray-900">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.617.793L4.414 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.414l3.969-3.793a1 1 0 011.617.793zM16 10a2 2 0 11-4 0 2 2 0 014 0z" clip-rule="evenodd"></path>
+                    </svg>
+                </button>
+                <button id="close-player" class="text-gray-600 hover:text-gray-900">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h3 class="text-2xl font-bold gradient-text mb-4" style="font-family: 'Playfair Display', serif;">Youth Resources</h3>
+                <p class="text-gray-400 mb-6">Empowering young minds through accessible education and community support</p>
+                <div class="flex justify-center space-x-6 mb-8">
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">About</a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">Privacy</a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">Terms</a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">Contact</a>
+                </div>
+                <p class="text-gray-500 text-sm">© 2024 Youth Resources. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+    <script>
+        // Mock podcast episodes data
+        const mockEpisodes = [
+            {
+                id: 1,
+                title: 'Building Confidence in Public Speaking',
+                description: 'Learn practical techniques to overcome stage fright and become a more confident speaker.',
+                author: 'Dr. Sarah Mitchell',
+                category: 'personal',
+                duration: '32:15',
+                date: '2024-01-22',
+                image: 'resources/youth-learning.jpg',
+                audioUrl: '#',
+                transcript: 'Full transcript available...',
+                tags: ['public speaking', 'confidence', 'communication']
+            },
+            {
+                id: 2,
+                title: 'Tech Careers: What You Need to Know',
+                description: 'Industry experts discuss emerging opportunities in technology and essential skills for success.',
+                author: 'Tech Leaders Panel',
+                category: 'technology',
+                duration: '48:30',
+                date: '2024-01-19',
+                image: 'resources/course-video.jpg',
+                audioUrl: '#',
+                transcript: 'Full transcript available...',
+                tags: ['technology', 'career', 'skills']
+            },
+            {
+                id: 3,
+                title: 'Financial Literacy for Young Adults',
+                description: 'Essential money management skills, budgeting tips, and investment basics for beginners.',
+                author: 'Maria Santos',
+                category: 'business',
+                duration: '41:20',
+                date: '2024-01-16',
+                image: 'resources/community.jpg',
+                audioUrl: '#',
+                transcript: 'Full transcript available...',
+                tags: ['finance', 'budgeting', 'investment']
+            },
+            {
+                id: 4,
+                title: 'Mental Health Awareness and Support',
+                description: 'Understanding mental health challenges and building resilience in challenging times.',
+                author: 'Dr. James Wilson',
+                category: 'health',
+                duration: '38:45',
+                date: '2024-01-13',
+                image: 'resources/inspiration.jpg',
+                audioUrl: '#',
+                transcript: 'Full transcript available...',
+                tags: ['mental health', 'resilience', 'wellness']
+            },
+            {
+                id: 5,
+                title: 'Creative Problem Solving Techniques',
+                description: 'Unlock your creative potential with innovative approaches to problem-solving and critical thinking.',
+                author: 'Creative Minds Collective',
+                category: 'education',
+                duration: '35:10',
+                date: '2024-01-10',
+                image: 'resources/skill-building.jpg',
+                audioUrl: '#',
+                transcript: 'Full transcript available...',
+                tags: ['creativity', 'problem solving', 'critical thinking']
+            },
+            {
+                id: 6,
+                title: 'Networking Strategies for Success',
+                description: 'Build meaningful professional relationships and expand your network effectively.',
+                author: 'Career Development Team',
+                category: 'career',
+                duration: '29:55',
+                date: '2024-01-07',
+                image: 'resources/career-guide.jpg',
+                audioUrl: '#',
+                transcript: 'Full transcript available...',
+                tags: ['networking', 'career', 'professional development']
+            }
+        ];
+        
+        let currentCategory = 'all';
+        let currentEpisode = null;
+        let isPlaying = false;
+        let currentTime = 0;
+        let duration = 0;
+        
+        // Initialize podcast functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            initializePodcasts();
+            displayEpisodes(mockEpisodes);
+        });
+        
+        function initializePodcasts() {
+            // Category tab event listeners
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.addEventListener('click', handleCategoryChange);
+            });
+            
+            // Audio player controls
+            document.getElementById('play-pause-btn').addEventListener('click', togglePlayPause);
+            document.getElementById('close-player').addEventListener('click', closeAudioPlayer);
+            document.getElementById('progress-bar').addEventListener('click', seekAudio);
+            
+            // Load more button
+            document.getElementById('load-more-episodes').addEventListener('click', loadMoreEpisodes);
+        }
+        
+        function handleCategoryChange(e) {
+            // Remove active class from all tabs
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Add active class to clicked tab
+            e.target.classList.add('active');
+            
+            currentCategory = e.target.dataset.category;
+            filterEpisodes();
+        }
+        
+        function filterEpisodes() {
+            let filteredEpisodes = mockEpisodes;
+            
+            if (currentCategory !== 'all') {
+                filteredEpisodes = mockEpisodes.filter(episode => 
+                    episode.category === currentCategory
+                );
+            }
+            
+            displayEpisodes(filteredEpisodes);
+        }
+        
+        function displayEpisodes(episodes) {
+            const container = document.getElementById('episodes-container');
+            container.innerHTML = '';
+            
+            episodes.forEach(episode => {
+                const episodeCard = createEpisodeCard(episode);
+                container.appendChild(episodeCard);
+            });
+            
+            // Animate cards
+            anime({
+                targets: '.podcast-card',
+                opacity: [0, 1],
+                translateY: [20, 0],
+                delay: anime.stagger(100),
+                duration: 600,
+                easing: 'easeOutQuart'
+            });
+        }
+        
+        function createEpisodeCard(episode) {
+            const card = document.createElement('div');
+            card.className = 'podcast-card overflow-hidden';
+            
+            const categoryColor = getCategoryColor(episode.category);
+            
+            card.innerHTML = `
+                <img src="${episode.image}" alt="${episode.title}" class="w-full h-48 object-cover">
+                <div class="p-6">
+                    <div class="flex items-center mb-3">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium" style="background-color: ${categoryColor}20; color: ${categoryColor}">
+                            ${getCategoryIcon(episode.category)} ${episode.category.charAt(0).toUpperCase() + episode.category.slice(1)}
+                        </span>
+                        <span class="ml-auto text-sm text-gray-500">${formatDate(episode.date)}</span>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2 line-clamp-2" style="color: var(--forest-green);">${episode.title}</h3>
+                    <p class="text-gray-600 mb-4 line-clamp-3">${episode.description}</p>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-sm text-gray-500">By ${episode.author}</span>
+                        <div class="flex items-center">
+                            <svg class="w-4 h-4 text-gray-400 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-sm text-gray-500">${episode.duration}</span>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        ${episode.tags.slice(0, 2).map(tag => `
+                            <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">${tag}</span>
+                        `).join('')}
+                    </div>
+                    <button class="w-full bg-green-600 text-white py-2 rounded-lg font-medium hover:bg-green-700 transition-colors" onclick="playEpisode(${episode.id})">
+                        ▶ Play Episode
+                    </button>
+                </div>
+            `;
+            
+            return card;
+        }
+        
+        function getCategoryIcon(category) {
+            const icons = {
+                education: '🎓',
+                career: '💼',
+                technology: '💻',
+                health: '🏥',
+                business: '📈',
+                personal: '🌱'
+            };
+            return icons[category] || '🎧';
+        }
+        
+        function getCategoryColor(category) {
+            const colors = {
+                education: '#3B82F6',
+                career: '#10B981',
+                technology: '#8B5CF6',
+                health: '#EF4444',
+                business: '#F59E0B',
+                personal: '#EC4899'
+            };
+            return colors[category] || '#6B7280';
+        }
+        
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+        
+        function playEpisode(episodeId) {
+            const episode = mockEpisodes.find(e => e.id === episodeId);
+            if (!episode) return;
+            
+            currentEpisode = episode;
+            showAudioPlayer();
+            YouthResources.showNotification(`Now playing: ${episode.title}`, 'info');
+        }
+        
+        function playFeaturedEpisode() {
+            const featuredEpisode = {
+                id: 'featured',
+                title: 'The Future of Digital Learning',
+                author: 'Youth Resources Team',
+                image: 'resources/podcast-studio.jpg',
+                duration: '45:00'
+            };
+            
+            currentEpisode = featuredEpisode;
+            showAudioPlayer();
+            YouthResources.showNotification('Playing featured episode', 'info');
+        }
+        
+        function showAudioPlayer() {
+            const player = document.getElementById('audio-player');
+            const playerImage = document.getElementById('player-image');
+            const playerTitle = document.getElementById('player-title');
+            const playerAuthor = document.getElementById('player-author');
+            
+            // Update player info
+            playerImage.src = currentEpisode.image;
+            playerImage.alt = currentEpisode.title;
+            playerTitle.textContent = currentEpisode.title;
+            playerAuthor.textContent = currentEpisode.author || 'Youth Resources';
+            
+            // Show player
+            player.classList.remove('translate-y-full');
+            
+            // Simulate audio loading
+            duration = parseDuration(currentEpisode.duration);
+            document.getElementById('total-time').textContent = formatTime(duration);
+        }
+        
+        function closeAudioPlayer() {
+            const player = document.getElementById('audio-player');
+            player.classList.add('translate-y-full');
+            isPlaying = false;
+            updatePlayPauseButton();
+        }
+        
+        function togglePlayPause() {
+            isPlaying = !isPlaying;
+            updatePlayPauseButton();
+            
+            if (isPlaying) {
+                startProgressSimulation();
+                YouthResources.showNotification('Playing audio...', 'info');
+            } else {
+                YouthResources.showNotification('Audio paused', 'info');
+            }
+        }
+        
+        function updatePlayPauseButton() {
+            const btn = document.getElementById('play-pause-btn');
+            btn.innerHTML = isPlaying ? '⏸' : '▶';
+        }
+        
+        function startProgressSimulation() {
+            if (!isPlaying) return;
+            
+            setTimeout(() => {
+                if (isPlaying && currentTime < duration) {
+                    currentTime += 1;
+                    updateProgress();
+                    startProgressSimulation();
+                } else if (currentTime >= duration) {
+                    // Episode finished
+                    isPlaying = false;
+                    currentTime = 0;
+                    updateProgress();
+                    updatePlayPauseButton();
+                    YouthResources.showNotification('Episode completed!', 'success');
+                }
+            }, 1000);
+        }
+        
+        function updateProgress() {
+            const progressFill = document.getElementById('progress-fill');
+            const currentTimeEl = document.getElementById('current-time');
+            
+            const percentage = (currentTime / duration) * 100;
+            progressFill.style.width = `${percentage}%`;
+            currentTimeEl.textContent = formatTime(currentTime);
+        }
+        
+        function seekAudio(e) {
+            const progressBar = document.getElementById('progress-bar');
+            const rect = progressBar.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const percentage = clickX / rect.width;
+            
+            currentTime = Math.floor(duration * percentage);
+            updateProgress();
+        }
+        
+        function parseDuration(durationString) {
+            const parts = durationString.split(':');
+            return parseInt(parts[0]) * 60 + parseInt(parts[1]);
+        }
+        
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+        
+        function loadMoreEpisodes() {
+            YouthResources.showNotification('Loading more episodes...', 'info');
+            
+            setTimeout(() => {
+                YouthResources.showNotification('All episodes loaded!', 'success');
+            }, 1000);
+        }
+        
+        // Mobile menu functionality
+        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        });
+    </script>
+</body>
+</html>
